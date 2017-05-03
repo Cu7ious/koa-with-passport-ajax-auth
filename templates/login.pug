@@ -1,0 +1,40 @@
+extends layout
+
+block content
+
+  form(action="/login" method="post" id="loginForm")
+    h1 Please sign in
+
+    .form-group
+      label(for="email") Email
+      input.form-control(type="email" id="email" name="email" placeholder="my@mail.com" required autofocus)
+    .form-group
+      label(for="password") Password
+      input.form-control(type="password" id="password" name="password" required)
+
+    button.btn.btn-lg.btn-primary.btn-block(type="submit") Login
+
+  script.
+    loginForm.onsubmit = function() {
+      fetch("/login", {
+        method: "POST",
+        credentials: "include", // "omit" by default, for cookies to work
+        body: new FormData(this)
+      })
+        .then(response => response.json())
+        .then(response => {
+          if (response.error) {
+            alert(response.error.message);
+          } else if (response.user) {
+            alert("Welcome, " + response.user.displayName);
+            window.location.reload(true);
+          } else {
+            throw new Error("Invalid response from the server");
+          }
+        })
+        .catch(function(err) {
+          alert("Error: " + err.message);
+        })
+
+      return false;
+    }
